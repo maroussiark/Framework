@@ -4,8 +4,10 @@
  */
 package etu1833.framework.servlet;
 
+import etu1833.framework.Mapping;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +19,7 @@ import utilitaire.Utilitaire;
  * @author maroussia
  */
 public class FrontServlet extends HttpServlet {
-    
+    HashMap<String,Mapping> MappingUrls;
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -40,7 +42,7 @@ public class FrontServlet extends HttpServlet {
             out.println("<body>");
             out.println("<h1>Servlet FrontServlet at " + request.getContextPath() + "</h1>");
 
-            String[] links = new Utilitaire().getUrl(url);
+            String[] links = new Utilitaire().lien(url);
 
 
             for (String url1 : links) {
