@@ -5,14 +5,20 @@
 package etu1833.framework.servlet;
 
 import etu1833.framework.Mapping;
+import helper.Fonction;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import utilitaire.Utilitaire;
+import annotation.Url;
 
 /**
  *
@@ -41,19 +47,38 @@ public class FrontServlet extends HttpServlet {
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet FrontServlet at " + request.getContextPath() + "</h1>");
+            
+            String link = Utilitaire.getUrl(url,request.getContextPath());
+            out.println(link);
+            out.println(this.MappingUrls.isEmpty());
 
-            String[] links = new Utilitaire().lien(url);
-
-
-            for (String url1 : links) {
-                out.print(url1);
-            }
             
             out.println("</body>");
             out.println("</html>");
         }
     }
-
+    @Override
+    public void init() throws ServletException{
+        Fonction fn  = new Fonction();
+        try {
+            //get
+            Class[] cls = fn.getAllClass("modele");
+          
+            for (Class cl : cls) {
+                Method[] m = fn.getAllMethodWithAnnotation(cl, Url.class);
+                if (m!=null) {
+                    for (Method m1 : m) {
+                        Url url = (Url) m1.getAnnotation(Url.class);
+                        this.MappingUrls.put(url.valeur(), new Mapping(cl.getName(), m1.getName()));
+                    }
+                }
+            }
+            
+        } catch (Exception ex) {
+            Logger.getLogger(FrontServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
