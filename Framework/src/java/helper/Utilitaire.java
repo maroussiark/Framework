@@ -15,9 +15,18 @@ public class Utilitaire {
         if(val.length==1){
             result = "/";
         }else{
-            result = val[1];
+            result = val[1].split("/")[1];
         }
         return result;
+    }
+    public static String[] lien(String url) throws Exception{
+        String[] reg = url.split("/");
+        System.out.println(reg.length);
+        if(reg.length >= 5){
+           return reg;
+        } else {
+            throw new Exception("tsy misy lien");
+        }     
     }
      
 }

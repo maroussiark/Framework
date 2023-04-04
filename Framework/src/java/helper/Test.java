@@ -2,16 +2,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package modele;
+package helper;
 
-import helper.annotation.Url;
 import etu1833.framework.view.ModelView;
+import helper.annotation.Url;
 
 /**
  *
  * @author maroussia
  */
-public class Emp {
+public class Test {
     String name;
 
     @Url(valeur = "get-name")

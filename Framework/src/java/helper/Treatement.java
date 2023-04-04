@@ -6,6 +6,7 @@ package helper;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Vector;
@@ -116,5 +117,20 @@ public class Treatement {
         Method[] fin = Arrays.copyOf(rep, rep.length,Method[].class);
 
         return fin;
+    }
+    public static Object getReturnValue(String className,String methodName) throws IllegalArgumentException, InvocationTargetException{
+            Object result = null;
+            try {
+                Class clazz = Class.forName(className);                
+                Object instance = clazz.newInstance();
+
+                Method method = clazz.getDeclaredMethod(methodName);
+
+                result = method.invoke(instance);
+            } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+                e.printStackTrace();
+            }
+            return result;
+
     }
 }
