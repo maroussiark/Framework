@@ -4,8 +4,9 @@
  */
 package etu1833.framework.servlet;
 
-import annotation.Url;
+import helper.annotation.Url;
 import etu1833.framework.Mapping;
+import etu1833.framework.view.ModelView;
 import helper.Treatement;
 import helper.Utilitaire;
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -58,14 +60,37 @@ public class FrontServlet extends HttpServlet {
             out.println("<title>COUCOU</title>");            
             out.println("</head>");
             out.println("<body>");
-//            out.println("<h1>Servlet FrontServlet at " + request.getContextPath() + "</h1>");
-            out.println("<h1>URL at " + Utilitaire.getUrl(request.getRequestURL().toString(),request.getContextPath())+ "</h1>");
+
+            
+            String link1 = Utilitaire.lien(request.getRequestURL().toString())[4];
              for (Map.Entry<String,Mapping> test: mappingUrls.entrySet()) {
-                out.println("URL: "+test.getKey()+" Class: "+test.getValue().getClassName()+" method: "+test.getValue().getMethod());
+                if(link1.compareToIgnoreCase(test.getKey())==0){
+                  
+                   Mapping mp =test.getValue();
+                   ModelView obj = (ModelView) Treatement.getReturnValue(mp.getClassName(), mp.getMethod());
+                   out.println("obj"+obj.getView());
+                   
+                    try {
+                        RequestDispatcher dispat = request.getRequestDispatcher("./page/"+obj.getView());
+                        dispat.forward(request,response);
+            
+                    } catch (Exception e) {
+                       e.getMessage();
+                    }
+                   break;
+                }else{
+                    out.println("404 NOT FOUND");
+                    break;
+                }
+                
             }
+                     
+                           out.println("coucou");
 
             out.println("</body>");
             out.println("</html>");
+        }catch(Exception e){
+            e.printStackTrace();
         }
     }
     @Override

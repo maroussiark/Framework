@@ -3,10 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/maroussia/S4/Web_dynamique/TestFramework/web/index.html</file>
-            <file>file:/home/maroussia/S4/Web_dynamique/TestFramework/src/java/controller/FrontServlet.java</file>
-            <file>file:/home/maroussia/S4/Web_dynamique/TestFramework/src/java/controller/Controller.java</file>
-            <file>file:/home/maroussia/S4/Web_dynamique/TestFramework/web/WEB-INF/web.xml</file>
+            <file>file:/home/maroussia/Documents/GitHub/Framework/TestFramework/src/java/controller/Controller.java</file>
+            <file>file:/home/maroussia/Documents/GitHub/Framework/TestFramework/src/java/modele/Emp.java</file>
+            <file>file:/home/maroussia/Documents/GitHub/Framework/TestFramework/src/java/controller/Cont.java</file>
+            <file>file:/home/maroussia/Documents/GitHub/Framework/TestFramework/src/java/main/Main.java</file>
         </group>
     </open-files>
 </project-private>

@@ -6,13 +6,14 @@ package controller;
 
 import etu1833.framework.Mapping;
 import etu1833.framework.servlet.FrontServlet;
+import etu1833.framework.view.ModelView;
+import helper.Treatement;
 import helper.Utilitaire;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServlet;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -46,9 +47,19 @@ public class Cont extends FrontServlet {
             out.println("</html>");
             out.println(Utilitaire.getUrl(request.getRequestURL().toString(),request.getContextPath()));
             for (Map.Entry<String,Mapping> test: getMappingUrls().entrySet()) {
-                out.println(test.getKey()+"  "+test.getValue().getClassName()+"  "+test.getValue().getMethod());
+                out.println(test.getKey()+" - "+test.getValue().getClassName()+"  "+test.getValue().getMethod());
             }
 
+              Mapping m = new Mapping("modele.Emp", "findAll");
+
+              ModelView obj = (ModelView) Treatement.getReturnValue(m.getClassName(), m.getMethod());
+              out.println("coucou");
+
+              out.println("obj"+obj.getView());
+
+               
+        }catch(Exception e){
+        
         }
     }
 
