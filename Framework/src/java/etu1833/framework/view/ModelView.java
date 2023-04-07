@@ -4,12 +4,16 @@
  */
 package etu1833.framework.view;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author maroussia
  */
 public class ModelView {
     private String view;
+    private HashMap<String, Object> data;
 
     public String getView() {
         return view;
@@ -20,6 +24,17 @@ public class ModelView {
     }
 
     public ModelView() {
+        this.data = new HashMap<>();
     }
-    
+
+    public HashMap<String, Object> getData() {
+        return data;
+    }
+
+    public void setData(HashMap<String, Object> data) {
+        this.data = data;
+    }
+    public void addItem(String key,Object obj){
+        this.data.put(key, obj);
+    }
 }

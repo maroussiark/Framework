@@ -57,41 +57,58 @@ public class FrontServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>COUCOU</title>");            
+            out.println("<title>EH</title>");            
             out.println("</head>");
             out.println("<body>");
-
-            
-            String link1 = Utilitaire.lien(request.getRequestURL().toString())[4];
-             for (Map.Entry<String,Mapping> test: mappingUrls.entrySet()) {
-                if(link1.compareToIgnoreCase(test.getKey())==0){
                   
-                   Mapping mp =test.getValue();
-                   ModelView obj = (ModelView) Treatement.getReturnValue(mp.getClassName(), mp.getMethod());
-                   out.println("obj"+obj.getView());
-                   
                     try {
-                        RequestDispatcher dispat = request.getRequestDispatcher("./page/"+obj.getView());
+                        String link1 = Utilitaire.lien(request.getRequestURL().toString())[4];
+                        Mapping mp = this.getMapping(link1);
+                        ModelView model = (ModelView) Treatement.getReturnValue(mp.getClassName(), mp.getMethod());
+                        
+                        out.println(model.getView());
+                        
+                        addData(request, model);
+                        RequestDispatcher dispat = request.getRequestDispatcher("./page/"+model.getView());
                         dispat.forward(request,response);
             
                     } catch (Exception e) {
-                       e.getMessage();
+                       out.println("Erreur: "+e.getMessage());        
+
+                       e.printStackTrace();
+
                     }
-                   break;
-                }else{
-                    out.println("404 NOT FOUND");
-                    break;
-                }
-                
+               
+                //out.println("coucou");
+
+                out.println("</body>");
+                out.println("</html>");
+            }catch(Exception e){
+         
             }
                      
-                           out.println("coucou");
-
-            out.println("</body>");
-            out.println("</html>");
-        }catch(Exception e){
-            e.printStackTrace();
-        }
+                           
+     
+    }
+    
+    public void addData(HttpServletRequest req,ModelView mv){
+          for (Map.Entry<String,Object> obj: mv.getData().entrySet()) {
+              req.setAttribute(obj.getKey(), obj.getValue());
+          }
+        
+    }
+    public Mapping getMapping(String url) throws Exception{
+        Mapping mp = new Mapping();
+         for (Map.Entry<String,Mapping> test: mappingUrls.entrySet()) {
+                if(url.compareToIgnoreCase(test.getKey())==0){
+                     mp =test.getValue();
+                     break;
+                }else{
+                    throw new Exception("URL NOT FOUND");
+                }
+         }
+         return mp;
+            
     }
     @Override
     public void init() throws ServletException{

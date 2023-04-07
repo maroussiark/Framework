@@ -3,13 +3,13 @@
     Created on : 24 mars 2023, 11:41:53
     Author     : maroussia
 --%>
-<%
-        out.println("eh");
 
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%
     out.println(request.getAttributeNames());    
     out.println(request.getAttribute("liste"));
+
 %>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -17,8 +17,7 @@
         <title>JSP Page</title>
     </head>
     <body>
-        dhh
-        <h1>Hello World!</h1>
+        <h1>Hello World!</h1>       
         <h1>Hello World!</h1>
 
     </body>

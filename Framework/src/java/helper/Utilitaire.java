@@ -25,7 +25,7 @@ public class Utilitaire {
         if(reg.length >= 5){
            return reg;
         } else {
-            throw new Exception("tsy misy lien");
+            throw new Exception("ENTRER L'URL");
         }     
     }
      
