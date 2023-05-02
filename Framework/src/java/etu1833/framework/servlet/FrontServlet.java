@@ -11,6 +11,7 @@ import helper.Treatement;
 import helper.Utilitaire;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +65,11 @@ public class FrontServlet extends HttpServlet {
                     try {
                         String link1 = Utilitaire.lien(request.getRequestURL().toString())[4];
                         Mapping mp = this.getMapping(link1);
-                        ModelView model = (ModelView) Treatement.getReturnValue(mp.getClassName(), mp.getMethod());
+                        
+                        Object obj = Class.forName(mp.getClassName()).newInstance();
+                        sendData(request, obj);
+                        
+                        ModelView model = getMv(mp, obj);
                         
                         out.println(model.getView());
                         
@@ -97,17 +102,43 @@ public class FrontServlet extends HttpServlet {
           }
         
     }
+    
+    public void sendData(HttpServletRequest request,Object obj) throws Exception{
+            Field[] fields = obj.getClass().getDeclaredFields();
+
+        for (Field field : fields) {
+            String value = request.getParameter(field.getName());
+            if (value != null) {
+                field.setAccessible(true);
+                field.set(obj, field.getType().cast(value));
+            }
+        }
+
+    }
+    
+    public ModelView getMv(Mapping map,Object obj) throws Exception {
+       // String method = map.getMethod();
+
+        // Object obj = Class.forName(classname).newInstance();
+
+       // Method m = obj.getClass().getDeclaredMethod(method, (Class<?>) null);
+        //m.setAccessible(true);
+        System.out.println(map.getMethod());
+        
+        Method method = obj.getClass().getDeclaredMethod(map.getMethod());
+        method.setAccessible(true);
+        ModelView mv = (ModelView) method.invoke(obj);
+
+        return mv;
+
+    }
     public Mapping getMapping(String url) throws Exception{
-        Mapping mp = new Mapping();
          for (Map.Entry<String,Mapping> test: mappingUrls.entrySet()) {
                 if(url.compareToIgnoreCase(test.getKey())==0){
-                     mp =test.getValue();
-                     break;
-                }else{
-                    throw new Exception("URL NOT FOUND");
+                     return test.getValue();
                 }
          }
-         return mp;
+         throw new Exception("URL NOT FOUND");
             
     }
     @Override
