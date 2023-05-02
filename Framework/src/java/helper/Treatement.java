@@ -125,7 +125,7 @@ public class Treatement {
                 Object instance = clazz.newInstance();
 
                 Method method = clazz.getDeclaredMethod(methodName);
-
+                
                 result = method.invoke(instance);
             } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
                 e.printStackTrace();
