@@ -14,6 +14,16 @@ import java.util.Vector;
  */
 public class Emp {
     String name;
+    String firstname;
+
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+    
 
     @Url(valeur = "get-name")
     public String getName() {
@@ -44,7 +54,23 @@ public class Emp {
         
         return mv;
     }
+    @Url(valeur="formulaire")
+    public ModelView formulaire(){
+        ModelView mv = new ModelView();
+        mv.setView("formulaire.jsp");
+        return mv;
+    }
+    @Url(valeur="save")
+    public ModelView save(){
+        ModelView mv = new ModelView();
 
+        // System.out.println("nom 1:"+this.getNom());
+        mv.addItem("nom",this.getName());
+
+        mv.setView("save.jsp");
+
+        return mv;
+    }
     public Emp() {
     }
 }

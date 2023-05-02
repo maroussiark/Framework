@@ -24,7 +24,6 @@
     </head>
     <body>
         <h1>Hello World!</h1>       
-        <h1>Hello World!</h1>
         <% out.println(emp.getName()); %>
         <% 
             for (int idx = 0; idx < empl.size(); idx++) {
