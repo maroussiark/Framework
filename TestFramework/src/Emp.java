@@ -1,114 +1,95 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
-package modele;
+package model;
 
-import helper.annotation.Url;
-import etu1833.framework.view.ModelView;
 import java.util.Vector;
+
+import annotation.Url;
+import etu1833.framework.ModelView;
+import java.util.Date;
 
 /**
  *
-
- 
  * @author maroussia
  */
 public class Emp {
-    int id;
-    String name;
-    String firstname;
+
+    String nom;
+    int age;
+    Date date;
     
-    public int getId() {
-        return this.id;
+    public Emp(String nom, int age) {
+        this.nom = nom;
+        this.age = age;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public Date getDate() {
+        return date;
     }
 
-    public String getFirstname() {
-        return firstname;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-    
-
-    @Url(valeur = "get-name")
-    public String getName() {
-        return name;
+    public Emp() {
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 
-    public Emp(int id, String name, String firstname) {
-        this.id = id;
-        this.name = name;
-        this.firstname = firstname;
-    }
-
-    public Emp(String name) {
-        this.name = name;
-    }
-    
     @Url(valeur="emp-all")
-    public ModelView findAll(){
+    public ModelView find(){
         ModelView mv = new ModelView();
-        mv.setView("emp-list.jsp");
-            
-        Vector<Emp> emp = new Vector<>();
-        emp.add(new Emp("Rakoto"));    
-        emp.add(new Emp("Rabe"));
-        emp.add(new Emp("Rasoa"));
+        mv.setUrl("test.jsp");
 
-        mv.addItem("list", emp);        
-        mv.addItem("liste", new Emp("Rasoa"));
-        
-        
+        Vector<Emp> data = new Vector<>();
+        data.add(new Emp("Faneva",10));
+        data.add(new Emp("Rakoto",12));
+        data.add(new Emp("Rakoto",15));
+
+        mv.addItem("list",data);
+
         return mv;
     }
-    @Url(valeur="formulaire")
-    public ModelView formulaire(){
+
+    @Url(valeur="emp-form")
+    public ModelView form(){
+
         ModelView mv = new ModelView();
-        mv.setView("formulaire.jsp");
+        mv.setUrl("formulaire.jsp");
+
         return mv;
     }
-    @Url(valeur="save")
+
+    @Url(valeur="emp-save")
     public ModelView save(){
         ModelView mv = new ModelView();
 
         // System.out.println("nom 1:"+this.getNom());
-        mv.addItem("nom",this.getName());
+        mv.addItem("age",this.getAge());
 
-        mv.setView("save.jsp");
+        mv.setUrl("valiny.jsp");
 
         return mv;
     }
-    @Url(valeur = "getEmp")
-    public ModelView getEmp(String nom){
-        ModelView mv = new ModelView();
-        Vector<Emp> emp = new Vector<>();
-        emp.add(new Emp(1,"Rakoto","malala"));    
-        emp.add(new Emp(2,"Rabe","Haja"));
-        emp.add(new Emp(3,"Rasoa","Ngita"));
 
-        mv.setView("fiche.jsp");
-        for (Emp emp2 : emp) {
-            // if(emp2.id == id){
-            //     mv.addItem("emp", emp2);
-            // }
-            if(nom.equalsIgnoreCase(emp2.getName())){
-                mv.addItem("emp", emp2);
-            }
-        }
-        
-        
-        return mv;
+
+
+    public String getNom() {
+        return nom;
+    } 
+
+    public void setNom(String nom) {
+        this.nom = nom;
     }
-    public Emp() {
+
+    public int getAge() {
+        return age;
     }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
 }
