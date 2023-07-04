@@ -1,30 +1,35 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
-package etu1833.framework.view;
+package etu1833.framework;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
  * @author maroussia
  */
 public class ModelView {
-    private String view;
-    private HashMap<String, Object> data;
+    String url;
+    HashMap <String,Object> data = new HashMap<>();;
 
-    public String getView() {
-        return view;
-    }
-
-    public void setView(String view) {
-        this.view = view;
-    }
-
+    
     public ModelView() {
-        this.data = new HashMap<>();
+    }
+
+    public ModelView(String url, HashMap<String, Object> data) {
+        this.url = url;
+        this.data = data;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public HashMap<String, Object> getData() {
@@ -34,7 +39,11 @@ public class ModelView {
     public void setData(HashMap<String, Object> data) {
         this.data = data;
     }
-    public void addItem(String key,Object obj){
-        this.data.put(key, obj);
+
+    public void addItem(String cle,Object valueur){
+        this.getData().put(cle, valueur);
     }
+    
+    
+    
 }
