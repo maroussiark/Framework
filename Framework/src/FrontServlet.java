@@ -4,28 +4,35 @@
  */
 package etu1833.framework.servlet;
 
-import helper.annotation.Url;
+import annotation.Fonction;
+import annotation.Url;
 import etu1833.framework.Mapping;
-import etu1833.framework.view.ModelView;
-import helper.Treatement;
-import helper.Utilitaire;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.reflect.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import etu1833.framework.ModelView;
 import jakarta.servlet.RequestDispatcher;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
+import java.text.SimpleDateFormat;
+import java.lang.reflect.*;
+import java.util.HashMap;
+import java.util.Map;
+import jakarta.servlet.annotation.MultipartConfig;
+import utility.FileUpload;
+import utility.Util;
+import java.util.Date;
 
 /**
  *
- * @author maroussia
+ * @author faneva
  */
+
+@MultipartConfig
 public class FrontServlet extends HttpServlet {
 
     HashMap<String, Mapping> mappingUrls = new HashMap<>();
@@ -37,179 +44,169 @@ public class FrontServlet extends HttpServlet {
     public void setMappingUrls(HashMap<String, Mapping> mappingUrls) {
         this.mappingUrls = mappingUrls;
     }
-    
-    
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>EH</title>");            
-            out.println("</head>");
-            out.println("<body>");
-                  
-                    try {
-                        String link1 = Utilitaire.lien(request.getRequestURL().toString())[4];
-                        Mapping mp = this.getMapping(link1);
-                        
-                        Object obj = Class.forName(mp.getClassName()).newInstance();
-                        sendData(request, obj);
-                        
-                        ModelView model = getModelView(request,mp, obj);
-                        
-                        // out.println(model.getView());
-                        
-                        addData(request, model);
-                        
-                        RequestDispatcher dispat = request.getRequestDispatcher("./page/"+model.getView());
-                        dispat.forward(request,response);
+        PrintWriter out = response.getWriter();
+        try {
+            String url = request.getRequestURL().toString();
+
+            Mapping map = this.getMapping(url);
+
+            Object obj = Class.forName(map.getClassName()).newInstance();
+            this.sendData(request,obj);
+
+            ModelView mv = this.getMv(request,map,obj);
+
+            String urlMv = mv.getUrl();
+            HashMap<String,Object> dataMv = mv.getData();
             
-                    } catch (Exception e) {
-                       out.println("Erreur: "+e.getMessage());        
-                       e.printStackTrace();
+            this.setAllAttribut(request, dataMv);
+            
 
-                    }
-               
-                //out.println("coucou");
+            RequestDispatcher disp = request.getRequestDispatcher("/jsp/"+urlMv);
+            disp.forward(request, response);
+        } catch (Exception e) {
+            out.println("URL :"+request.getRequestURL().toString());
+            out.println("ERROR :"+e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
-                out.println("</body>");
-                out.println("</html>");
-            }catch(Exception e){
-         
-            }
-                     
-                           
-     
-    }
-    
-    public void addData(HttpServletRequest req,ModelView mv){
-          for (Map.Entry<String,Object> obj: mv.getData().entrySet()) {
-              req.setAttribute(obj.getKey(), obj.getValue());
-          }
-        
-    }
-    
+    /*
+        mandefa donnees affichage --> back
+    */
     public void sendData(HttpServletRequest request,Object obj) throws Exception{
-            Field[] fields = obj.getClass().getDeclaredFields();
+        Field[] fields = obj.getClass().getDeclaredFields();
 
-        for (Field field : fields) {
-            String value = request.getParameter(field.getName());
-            if (value != null) {
-                field.setAccessible(true);
-                field.set(obj, field.getType().cast(value));
-            }
+        for (int i = 0; i < fields.length; i++) {
+            Class inCaseToCastManually = fields[i].getType();
+
+            if(inCaseToCastManually == FileUpload.class) {
+                try {
+                    Part file = request.getPart(fields[i].getName());
+                    if(file.getSize() > 0){
+                        byte[] b = this.partToByte(file);
+                        fields[i].setAccessible(true);
+                        fields[i].set(obj, new FileUpload(file.getSubmittedFileName(),null,b));
+                    }
+                } catch (Exception e) {
+                }
+            } else {
+                String value = request.getParameter(fields[i].getName());
+
+                if(value != null){
+                    fields[i].setAccessible(true);
+                    fields[i].set(obj, Util.cast(value, inCaseToCastManually));
+    
+                }
+            }  
+
+            
+        }
+    }
+
+    public byte[] partToByte(Part file) throws Exception{
+        InputStream inp = file.getInputStream();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+
+        while((bytesRead = inp.read(buffer)) != -1){
+            bos.write(buffer, 0, bytesRead);
         }
 
-    }
-    
-    public ModelView getModelView(HttpServletRequest request, Mapping map,Object obj) throws Exception {
-        
-        Method method = obj.getClass().getDeclaredMethod(map.getMethod(),map.getClassArgument());
-        method.setAccessible(true);
-        Object[] argument = argumentValues(request, method);
-        ModelView mv = (ModelView) method.invoke(obj,argument);
+        byte[] byteArray = bos.toByteArray();
 
-        return mv;
+        bos.close();
+        inp.close();
+
+        return byteArray;
 
     }
 
-    //methode pour prendre les valeurs des arguments
-    public Object[] argumentValues(HttpServletRequest request, Method method) throws Exception {
-        Parameter[] param = method.getParameters();
+    public void setAllAttribut(HttpServletRequest request, HashMap<String, Object> data) throws Exception {
+        for (Map.Entry<String, Object> alldata : data.entrySet()) {
+            request.setAttribute(alldata.getKey(), alldata.getValue());
+        }
+    }
+
+    public Object[] argumentValues(HttpServletRequest request, Method meth) throws Exception {
+        Parameter[] param = meth.getParameters();
 
         Object[] values = new Object[param.length];
         for (int i = 0; i < values.length; i++) {
             Class type = param[i].getType();
-            System.out.println(type.getName());
             String value = request.getParameter(param[i].getName());
-            values[i] = Treatement.cast(value, type);
+            values[i] = Util.cast(value, type);
         }
 
         return values;
     }
+    
 
-    //Prendre Mapping : Class,Methode,Argument correspondant de L'URL
-    public Mapping getMapping(String url) throws Exception{
-        System.out.println(url);
-         for (Map.Entry<String,Mapping> test: mappingUrls.entrySet()) {
-                System.out.println(test.getKey());
-                if(url.compareToIgnoreCase(test.getKey())==0){
-                     return test.getValue();
-                }
-         }
-         throw new Exception("URL NOT FOUND");
-            
+    public ModelView getMv(HttpServletRequest request,Mapping map,Object obj) throws Exception {
+
+        String classname = map.getClassName();
+        String method = map.getMethod();
+        Class[] argumentType = map.getMethodArgumentType();
+
+        Method m = obj.getClass().getDeclaredMethod(method, argumentType);
+        m.setAccessible(true);
+
+        Object[] argValues = this.argumentValues(request, m);
+        ModelView mv = (ModelView) m.invoke(obj, argValues);
+        // System.out.println("SIZE : "+mv.getData().size());
+
+        return mv;
+
     }
-    //Prendre tous les methodes annoter
+    
+
+    /*
+     * fonction maka anle mapping mifanaraka
+     * amle slug(url), oh: emp-add
+     * slug indice 4 ilay ao arinanle anarnle projet
+     * amle lien
+     */
+    public Mapping getMapping(String url) throws Exception {
+        String[] slug = Util.lien(url);
+        for (Map.Entry<String, Mapping> all : mappingUrls.entrySet()) {
+            if (slug[4].compareToIgnoreCase(all.getKey()) == 0) {
+                return all.getValue();
+            }
+        }
+        throw new Exception("Lien tsy misy");
+    }
+
     @Override
-    public void init() throws ServletException{
+    public void init() throws ServletException {
         try {
-            //get
-            Class[] cls = Treatement.getAllClasses();
-          
-            for (Class cl : cls) {
-                System.out.println(cls.getClass().getName());
-                Method[] m = Treatement.getAllMethodWithAnnotation(cl, Url.class);
-                if (m!=null) {
-                    for (Method m1 : m) {
-                        Url url = (Url) m1.getAnnotation(Url.class);
-                        this.mappingUrls.put(url.valeur(), new Mapping(cl.getName(), m1.getName(),m1.getParameterTypes()));      
-                    }
+            Class[] all = Fonction.getAllClasses();
+            for (Class a : all) {
+                Method[] mtd = Fonction.getMethodsWithAnnotation(a, Url.class);
+                for (int i = 0; i < mtd.length; i++) {
+                    Url m = (Url) mtd[i].getAnnotation(Url.class);
+                    this.mappingUrls.put(m.valeur(), new Mapping(a.getName(), mtd[i].getName(), mtd[i].getParameterTypes()));
                 }
             }
-            
-        } catch (Exception ex) {
-            Logger.getLogger(FrontServlet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
         }
-        
     }
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
         return "Short description";
