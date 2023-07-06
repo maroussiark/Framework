@@ -7,7 +7,7 @@ package etu1833.framework;
 
 /**
  *
- * @author ITU
+ * @author maroussia
  */
 public class Mapping {
     String className;
