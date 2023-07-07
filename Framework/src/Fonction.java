@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 /**
  *
- * @author maroussia
+ * @author faneva
  */
 public class Fonction {
     
