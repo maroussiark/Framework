@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author ITU
+ * @author maroussia
  */
 public class ModelView {
     String url;
