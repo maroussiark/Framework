@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat;
 
 /**
  *
- * @author maroussi
+ * @author maroussia
  */
 public class Util {
     
